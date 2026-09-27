@@ -1,0 +1,114 @@
+<aside class="panel" role="dialog" aria-labelledby="settings-title" (click)="$event.stopPropagation()">
+  <header>
+    <div>
+      <h2 id="settings-title">Assistant settings</h2>
+      <p>Each provider keeps its own key. Switching Gemini, Grok, or Groq uses that saved key.</p>
+    </div>
+    <button type="button" class="ghost" (click)="closed.emit()">Close</button>
+  </header>
+
+  <section>
+    <h3>Provider</h3>
+    <div class="segment">
+      @for (provider of providers; track provider.id) {
+        <button
+          type="button"
+          [class.on]="settings.provider() === provider.id"
+          (click)="setProvider(provider.id)"
+        >
+          {{ provider.name }}
+        </button>
+      }
+    </div>
+  </section>
+
+  @if (settings.provider() !== 'ollama') {
+    <section>
+      <h3>{{ settings.profile().name }} API key</h3>
+      @if (canEditKey()) {
+        <label>
+          Key
+          <input
+            type="password"
+            autocomplete="off"
+            [value]="settings.activeApiKey()"
+            [placeholder]="settings.profile().keyHint"
+            (input)="onApiKey($event)"
+          />
+        </label>
+
+        @if (detected(); as match) {
+          @if (match.id === settings.provider()) {
+            <p class="detect">This is a {{ match.name }} key. {{ match.name }} is selected.</p>
+          } @else {
+            <p class="detect warn">This looks like a {{ match.name }} key. It is saved for {{ match.name }}, which is now selected.</p>
+          }
+        } @else if (settings.activeApiKey().trim()) {
+          <p class="detect warn">This key format is unknown. {{ settings.profile().name }} keys start with {{ settings.profile().keyHint }}.</p>
+        } @else {
+          <p class="help">
+            Paste a {{ settings.profile().name }} key ({{ settings.profile().keyHint }}). Other providers keep their own saved keys.
+          </p>
+        }
+      } @else {
+        <div class="totp-lock">
+          <p class="help">Enter a Google Authenticator code to view or change the {{ settings.profile().name }} API key.</p>
+          <p class="masked">Saved key: {{ maskedKey() }}</p>
+          <app-totp-form mode="key" />
+        </div>
+      }
+    </section>
+  }
+
+  @if (settings.provider() === 'ollama') {
+    <section>
+      <h3>Ollama</h3>
+      <label>
+        Base URL
+        <input [value]="settings.snapshot().ollamaBaseUrl" (input)="onOllamaUrl($event)" />
+      </label>
+      <p class="help">
+        Default <code>/llm/ollama</code> maps to <code>http://127.0.0.1:11434</code> while
+        <code>ng serve</code> is running.
+      </p>
+    </section>
+  }
+
+  <section>
+    <h3>Model</h3>
+    <label>
+      Model
+      <input [value]="settings.activeModel()" list="provider-models" (input)="onModel($event)" />
+    </label>
+    <p class="help">
+      {{ settings.profile().help }}
+      @if (settings.profile().keyUrl; as url) {
+        Get a key from
+        <a [href]="url" target="_blank" rel="noopener">{{ settings.profile().name }}</a>.
+      }
+    </p>
+  </section>
+
+  <section>
+    <h3>System prompt</h3>
+    <label>
+      Personality
+      <textarea rows="5" [value]="settings.snapshot().systemPrompt" (input)="onSystemPrompt($event)"></textarea>
+    </label>
+  </section>
+
+  <section class="save-row">
+    <button type="button" class="save" (click)="save()">Save to properties file</button>
+    @if (settings.saveMessage(); as message) {
+      <p class="detect" [class.warn]="settings.saveError()">{{ message }}</p>
+    } @else {
+      <p class="help">Saves Gemini, Grok, and Groq keys to <code>kalai.properties</code> on this computer. The selected provider is used for chat.</p>
+    }
+  </section>
+
+  <datalist id="provider-models">
+    @for (model of session.models.value() ?? []; track model) {
+      <option [value]="model"></option>
+    }
+  </datalist>
+</aside>

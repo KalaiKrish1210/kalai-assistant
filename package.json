@@ -1,0 +1,97 @@
+{
+  "name": "kalai-assistant",
+  "version": "1.0.0",
+  "description": "Personal desktop assistant for Gemini, Grok, Groq, and Ollama",
+  "author": "Kalai",
+  "private": true,
+  "main": "desktop/main.js",
+  "packageManager": "npm@11.19.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve --open",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "icon": "node desktop/make-icon.js",
+    "desktop": "ng build && node desktop/make-icon.js && env -u ELECTRON_RUN_AS_NODE electron .",
+    "dist": "ng build && node desktop/make-icon.js && env -u ELECTRON_RUN_AS_NODE CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --publish never",
+    "dist:mac": "ng build && node desktop/make-icon.js && env -u ELECTRON_RUN_AS_NODE CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --mac --publish never",
+    "dist:win": "ng build && node desktop/make-icon.js && env -u ELECTRON_RUN_AS_NODE CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win --publish never",
+    "dist:linux": "ng build && node desktop/make-icon.js && env -u ELECTRON_RUN_AS_NODE CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --linux --publish never"
+  },
+  "dependencies": {
+    "@angular/common": "^22.1.0",
+    "@angular/compiler": "^22.1.0",
+    "@angular/core": "^22.1.0",
+    "@angular/forms": "^22.1.0",
+    "@angular/platform-browser": "^22.1.0",
+    "@angular/router": "^22.1.0",
+    "otpauth": "^9.5.2",
+    "qrcode": "^1.5.4",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0"
+  },
+  "devDependencies": {
+    "@angular/build": "^22.1.8",
+    "@angular/cli": "^22.1.8",
+    "@angular/compiler-cli": "^22.1.0",
+    "@types/qrcode": "^1.5.6",
+    "electron": "^38.8.6",
+    "electron-builder": "^26.15.3",
+    "prettier": "^3.8.1",
+    "typescript": "~6.0.2"
+  },
+  "build": {
+    "appId": "app.kalai.assistant",
+    "productName": "Kalai Assistant",
+    "copyright": "Copyright © Kalai",
+    "asar": true,
+    "directories": {
+      "output": "release",
+      "buildResources": "desktop/icons"
+    },
+    "files": [
+      "desktop/**/*",
+      "!desktop/make-icon.js",
+      "dist/kalai-assistant/browser/**/*",
+      "!dist/kalai-assistant/browser/kalai.properties",
+      "package.json",
+      "!**/node_modules/**"
+    ],
+    "extraMetadata": {
+      "main": "desktop/main.js"
+    },
+    "mac": {
+      "category": "public.app-category.productivity",
+      "icon": "desktop/icons/icon.png",
+      "identity": null,
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "desktop/icons/icon.png",
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "category": "Utility",
+      "icon": "desktop/icons/icon.png",
+      "target": [
+        "AppImage"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Kalai Assistant"
+    },
+    "dmg": {
+      "artifactName": "Kalai-Assistant-${version}-mac.${ext}"
+    }
+  }
+}

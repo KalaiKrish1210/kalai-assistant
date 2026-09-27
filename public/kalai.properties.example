@@ -1,0 +1,16 @@
+# Kalai Assistant
+# Copy to kalai.properties and fill provider keys, or save from Settings.
+# auth.secret is written when you scan the Google Authenticator QR on first launch.
+# Each cloud provider keeps its own key.
+
+gemini.key=
+grok.key=
+groq.key=
+auth.secret=
+provider=gemini
+gemini.model=gemini-3.6-flash
+grok.model=grok-3-mini
+groq.model=openai/gpt-oss-120b
+ollama.baseUrl=/llm/ollama
+ollama.model=llama3.2
+system.prompt=You are Kalai, a private personal assistant. Be concise, practical, and honest. Prefer clear next steps. If you are unsure, say so.

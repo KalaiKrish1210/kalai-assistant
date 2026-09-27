@@ -1,0 +1,37 @@
+<div class="app" [class.sidebar-open]="sidebarOpen()">
+  @if (sidebarOpen()) {
+    <button type="button" class="backdrop" aria-label="Close chats" (click)="sidebarOpen.set(false)"></button>
+  }
+  <aside class="sidebar">
+    <app-conversation-sidebar />
+  </aside>
+
+  <section class="stage">
+    <header class="top">
+      <button type="button" class="ghost menu" (click)="sidebarOpen.set(!sidebarOpen())">Chats</button>
+      <div class="status">
+        <strong>{{ settings.profile().name }}</strong>
+        <span>{{ settings.activeModel() }}</span>
+      </div>
+      <div class="actions">
+        @if (session.isStreaming()) {
+          <button type="button" class="ghost" (click)="session.stop()">Stop</button>
+        }
+        <button type="button" class="ghost" (click)="settingsOpen.set(true)">Settings</button>
+        <button type="button" class="ghost" (click)="lock()">Lock</button>
+      </div>
+    </header>
+
+    <app-message-list />
+
+    @if (session.error(); as error) {
+      <p class="error" role="alert">{{ error }}</p>
+    }
+
+    <app-composer [busy]="session.isStreaming()" (sent)="session.send($event)" />
+  </section>
+</div>
+
+@if (settingsOpen()) {
+  <app-settings-panel (closed)="settingsOpen.set(false)" />
+}
